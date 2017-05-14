@@ -1,0 +1,130 @@
+****************************DBUtil***************************************
+package com.wipro.money.util;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DBUtil {
+public static Connection getDBConn()
+{
+Connection con=null;
+	
+	try{
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		
+		con = DriverManager.getConnection("Jdbc:Oracle:thin:@localhost:1521:ORCL", "B2376505", "B2376505");
+	
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}
+	return con;
+}
+}
+
+
+
+*******************************GENERATEid(USING NAME)********************************
+public String generateCandidateId (String name)
+	{
+		String id="";
+		String id1="";
+				try{
+			Connection con=DBUtil.getDBConn();
+			PreparedStatement pstmt = con.prepareStatement("select candid_seq.NEXTVAL from dual");
+			ResultSet rs = pstmt.executeQuery();
+			if(rs.next()) 
+				id = rs.getString(1);
+			System.out.println(id);
+			String s1 =name.substring(0,2);
+			String s2 = s1.toUpperCase();
+			id1 = s2+id;
+			System.out.println(id1);
+			
+		}
+		catch(Exception e){
+			System.out.println("Within exception block of generate Id");
+		}
+				return id1;
+		
+		
+	}
+}
+
+
+*******************************GENERATEid(USING DATE)********************************
+
+
+public String generateSalesID(java.util.Date salesDate)
+	{
+		Sales sal=new Sales();
+	int salesId=0;
+		try{
+		con=DBUtil.getDBConnection();
+		PreparedStatement psmt=con.prepareStatement("select SEQ_SALES_ID.NEXTVAL from dual");
+		ResultSet rs=psmt.executeQuery();
+		if(rs.next())
+			salesId=rs.getInt(1);
+			System.out.println(salesId);
+			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		String d=sal.getSales_Date().toString().substring(9, 11); 
+		String salesIj=d+salesId;
+		System.out.println(salesId);
+		return salesIj;
+		
+	}
+	
+
+*********************************INSERTQUERRY*****************************
+
+Connection con=DBUtil.getDBConn();
+			
+	PreparedStatement ps=con.prepareStatement("insert into candidate_tbl values(?,?,?,?,?,?,?)");
+			ps.setString(1, studentBean.getId());
+			ps.setString(2, studentBean.getName());
+			ps.setInt(3, studentBean.getM1());
+			ps.setInt(4, studentBean.getM2());
+			ps.setInt(5, studentBean.getM3());
+			ps.setString(6, studentBean.getResult());
+			ps.setString(7, studentBean.getGrade());
+			ps.executeUpdate();
+			status="SUCCESS";
+
+
+********************************ArrayList********************************************
+public ArrayList<CandidateBean> getByResult(String criteria) 
+	{
+		
+			CandidateBean cb=null;
+	
+		ArrayList<CandidateBean> list=new ArrayList<CandidateBean>();
+		try
+		{
+			if(criteria=="PASS")
+		{
+			Connection con=DBUtil.getDBConn();
+			
+			PreparedStatement ps=con.prepareStatement("select * from candidate_tbl where result='PASS'");
+			
+			ResultSet rs=ps.executeQuery();
+			while(rs.next())
+			{
+			cb=new CandidateBean();
+			cb.setId(rs.getString(1));
+			cb.setName(rs.getString(2));
+			cb.setM1(rs.getInt(3));
+			cb.setM2(rs.getInt(4));
+			cb.setM3(rs.getInt(5));
+			cb.setResult(rs.getString(6));
+			cb.setGrade(rs.getString(7));
+			list.add(cb);
+			}
+		}
